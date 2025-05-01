@@ -32,7 +32,6 @@ public class Account {
     private String accountNumber;  
     private String currency;
     private AccountType accountType;
-    @Transient
     private float balance;
     private Status status;
     private LocalDateTime createdAt;

@@ -50,7 +50,6 @@ public class CustomerController {
         
         @PostMapping("/getCustomers/filter")
         public List<Customer> getMethodName(@RequestParam("firstname") String firstName, @RequestParam("lastname") String lastName) {
-            System.out.println("controller"+firstName+lastName);
             return customerService.getCustomerByFilter(firstName,lastName);
         }
         

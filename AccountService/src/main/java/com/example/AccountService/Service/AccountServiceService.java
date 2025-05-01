@@ -14,7 +14,7 @@ import com.example.AccountService.Enums.Enums;
 import com.example.AccountService.Feign.CustomerClient;
 import com.example.AccountService.Feign.DepositServiceClient;
 import com.example.AccountService.Feign.LedgerClient;
-import com.example.AccountService.Model.Account;
+import com.example.AccountService.Model.Account;  
 import com.example.AccountService.Model.AccountResponseWithoutBalance;
 import com.example.AccountService.Repository.AccountServiceRepo;
 import com.example.AccountService.UtilityClass.Utility;
@@ -38,7 +38,7 @@ public class AccountServiceService {
      @Autowired
      LedgerClient ledgerClient;
 
-     public AccountResponseWithoutBalance createAccount(Account acc) {
+     public Account createAccount(Account acc) {
 
         Customer customer = customerClient.getCustomerById(acc.getCustomerId());
         DepositProduct depositProduct = depositServiceClient.getDepositProduct(acc.getDepositProductId());
@@ -57,7 +57,6 @@ public class AccountServiceService {
             throw new IllegalArgumentException("No matching personId found between Account and Customer.");
         }
   
-        AccountResponseWithoutBalance createAcc;
         List<Account> listOfAccounts=getAccountsByCustomerAndDeposit(acc.getCustomerId(),depositProduct.getDepositProductId());
         if(listOfAccounts.size()<depositProduct.getNoOfAccountPerCustomer()){
             acc.setAccountId(Utility.generateId());
@@ -66,6 +65,10 @@ public class AccountServiceService {
                 acc.setAccountNumber(Utility.generateId());
             }
         
+            if(acc.getBalance()==0.0){
+            acc.setBalance(depositProduct.getMinBalance());
+            }
+            
             acc.setCurrency(depositProduct.getCurrency().toString());
 
             acc.setCreatedAt(LocalDateTime.now());
@@ -73,15 +76,14 @@ public class AccountServiceService {
             //create ledger account for all deposit account
             ledgerClient.createLedgerAccount(acc);
 
-            Account savedAcc = accountServiceRepo.save(acc);
-            createAcc = new AccountResponseWithoutBalance();
-            BeanUtils.copyProperties(savedAcc, createAcc);
+            accountServiceRepo.save(acc);
+    
 
         }else{
             throw new IllegalArgumentException("Account per customer limit reached");
         }
 
-        return createAcc;
+        return acc;
 
     }
     

@@ -28,7 +28,7 @@ public class AccountServiceController {
     AccountServiceService accountServiceService;
     
     @PostMapping("/createAccount")
-    public AccountResponseWithoutBalance createAccount(@Valid @RequestBody Account acc) {
+    public Account createAccount(@Valid @RequestBody Account acc) {
        return accountServiceService.createAccount(acc);
     }
 

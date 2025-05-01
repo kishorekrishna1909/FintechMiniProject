@@ -25,4 +25,10 @@ public class BookTransactionController {
     public BookTransaction getTransactionById(@PathVariable("id") String id){
         return bookTransactionService.getTransactionById(id);
     }
+
+    @PostMapping("/listTransaction")
+    public List<BookTransaction> ListTransaciton(@RequestParam("customerId") String customerId,@RequestParam("status")String status,@RequestParam("order") String order,@RequestParam("originatorAccountId") String originatorAccountId,@RequestParam("beneficiaryAccountId") String beneficiaryAccountId){
+       return bookTransactionService.listTransaction();
+    }
+
 }

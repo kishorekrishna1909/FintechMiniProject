@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.BookTransaction.ClientCall.AccountClient;
-import com.example.BookTransaction.ClientCall.LedgerClient;
+import com.example.BookTransaction.ClientCall.*;
 import com.example.BookTransaction.Model.BookTransaction;
 import com.example.BookTransaction.Repository.BookTransactionRepo;
 import com.example.SharedModule.Model.Account;
@@ -15,8 +15,9 @@ import java.time.LocalDateTime;
 
 import com.example.BookTransaction.Enums.Enums;
 import com.example.BookTransaction.UtilityClass.Utility;
-
-import jakarta.transaction.Transactional;
+import com.example.SharedModule.Model.DepositProduct;
+import com.example.SharedModule.Enums.Enums.Status;
+import com.example.SharedModule.Enums.Enums.AccountType;
 
 @Service
 public class BookTransactionService {
@@ -29,6 +30,9 @@ public class BookTransactionService {
 
     @Autowired
     AccountClient accountClient;
+
+    @Autowired
+    DepositClient depositServiceClient;
 
   //  @Transactional
     public BookTransaction createBookTransaction(BookTransaction bookTrans) {
@@ -44,8 +48,10 @@ public class BookTransactionService {
         Account originator = accountClient.getAccount(bookTrans.getOriginatorAccountId());
         Account beneficiary = accountClient.getAccount(bookTrans.getBeneficiaryAccountId());
     
-        if ("CLOSED".equals(originator.getStatus()) || "BLOCKED".equals(originator.getStatus())
-            || "CLOSED".equals(beneficiary.getStatus()) || "BLOCKED".equals(beneficiary.getStatus())) {
+        System.out.println("service="+originator+"==="+originator.getStatus());
+        System.out.println(Status.BLOCKED.equals(originator.getStatus()));
+        if (Status.BLOCKED.equals(originator.getStatus()) || Status.CLOSED.equals(originator.getStatus())
+            || Status.CLOSED.equals(beneficiary.getStatus()) || Status.BLOCKED.equals(beneficiary.getStatus())) {
             throw new IllegalStateException("ACCOUNT_CLOSED_OR_BLOCKED_CONTACT_BANK");
         }
     
@@ -54,18 +60,22 @@ public class BookTransactionService {
         Ledger beneficiaryLedger = ledgerClient.getLedgerAccount(beneficiary.getAccountId());
     
         // Compute balances after transaction
-        float originatorNewBalance = "CREDIT_NORMAL_ACCOUNT".equals(originatorLedger.getAccountType())
+        float originatorNewBalance = AccountType.CREDIT_NORMAL_ACCOUNT.equals(originatorLedger.getAccountType())
             ? originatorLedger.getBalance() - bookTrans.getAmount()
             : originatorLedger.getBalance() + bookTrans.getAmount();
     
-        float beneficiaryNewBalance = "CREDIT_NORMAL_ACCOUNT".equals(beneficiaryLedger.getAccountType())
+        float beneficiaryNewBalance = AccountType.CREDIT_NORMAL_ACCOUNT.equals(beneficiaryLedger.getAccountType())
             ? beneficiaryLedger.getBalance() + bookTrans.getAmount()
             : beneficiaryLedger.getBalance() - bookTrans.getAmount();
     
+        DepositProduct depositProduct=depositServiceClient.getDepositProduct(originator.getDepositProductId());
+
         if (originatorNewBalance < 0 || beneficiaryNewBalance < 0) {
             bookTrans.setStatus(Enums.Status.FAILED);
             bookTransactionRepo.save(bookTrans);
             throw new IllegalStateException("INSUFFICIENT_FUNDS");
+        }else if(originatorNewBalance<depositProduct.getMinBalance()){
+            throw new IllegalStateException("MINIMUM_BALANCE_NEED_TO_BE_MAINTAINED");
         }
  
         originatorLedger.setBalance(originatorNewBalance);
@@ -84,5 +94,8 @@ public class BookTransactionService {
        return bookTransactionRepo.findById(id).orElseThrow();
     }
     
+    public BookTransaction ListTransaciton(@RequestParam("customerId") String customerId,String status,String order,String originatorAccountId,String beneficiaryAccountId){
+
+    }
 }
 
