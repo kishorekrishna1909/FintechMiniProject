@@ -1,10 +1,13 @@
 package com.example.BookTransaction.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.BookTransaction.Model.BookTransaction;
@@ -27,8 +30,14 @@ public class BookTransactionController {
     }
 
     @PostMapping("/listTransaction")
-    public List<BookTransaction> ListTransaciton(@RequestParam("customerId") String customerId,@RequestParam("status")String status,@RequestParam("order") String order,@RequestParam("originatorAccountId") String originatorAccountId,@RequestParam("beneficiaryAccountId") String beneficiaryAccountId){
-       return bookTransactionService.listTransaction();
+    public List<BookTransaction> listTransaction(
+        @RequestParam(required = false) String customerId,
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) String originatorAccountId,
+        @RequestParam(required = false) String beneficiaryAccountId,
+        @RequestParam(defaultValue = "ascending") String order
+        ) {
+       return bookTransactionService.listTransaction( customerId, status, order, originatorAccountId, beneficiaryAccountId);
     }
 
 }
