@@ -29,11 +29,7 @@ public class CardProductService {
     }
 
     public CardProduct getCardProduct(String id) {
-       CardProduct cp= cardproductRepository.findById(id).orElseThrow();
-       if(cp.getStatus().equals(CardProductEnums.Status.ACTIVE)){
-        return cp;
-       }
-       throw new IllegalStateException("Card product is not active");
+       return cardproductRepository.findById(id).orElseThrow();
     }
 
     public CardProduct deactivateCardProduct(String id) {

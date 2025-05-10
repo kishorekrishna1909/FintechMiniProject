@@ -1,11 +1,15 @@
 package com.example.AccountService.Model;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.*;
 
 import com.example.AccountService.Enums.Enums.AccountType;
 import com.example.AccountService.Enums.Enums.Status;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -24,11 +28,12 @@ import lombok.NoArgsConstructor;
 public class Account {
     @Id
     private String accountId;
-    private String personId;
     @NotBlank(message="CustomerId is mandotory field")
     private String customerId;
-    @NotBlank(message="CustomerId is mandotory field")
+    @NotBlank(message="depositProductId is mandotory field")
     private String depositProductId;
+    @Convert(converter = StringListConverter.class)
+    private Set<String> personId;
     private String accountNumber;  
     private String currency;
     private AccountType accountType;

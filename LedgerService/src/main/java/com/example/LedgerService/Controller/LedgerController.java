@@ -20,6 +20,7 @@ public class LedgerController {
 
     @PostMapping("/createLedgerAccount")
    public void createLedgerAccount(@RequestBody Account acc){
+      System.out.println("controll"+acc);
        ledgerService.createLedgerAccount(acc);
    }
 

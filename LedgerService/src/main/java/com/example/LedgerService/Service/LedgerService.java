@@ -19,12 +19,13 @@ public class LedgerService {
     Ledger ledger=null;
 
     public void createLedgerAccount(Account acc){
+        System.out.println("service"+acc);
         Ledger ledger=new Ledger();
-        ledger.setAccountId(acc.accountId);
+        ledger.setAccountId(acc.getAccountId());
         ledger.setLedgerAccountId(Utility.generateId());
-        ledger.setCurrency(acc.currency);
-        ledger.setAccountType(acc.accountType.toString());
-        ledger.setBalance(acc.balance);
+        ledger.setCurrency(acc.getCurrency());
+        ledger.setAccountType(acc.getAccountType().toString());
+        ledger.setBalance(acc.getBalance());
         ledger.setCreatedAt(LocalDateTime.now());
         ledgerRepo.save(ledger);
     }

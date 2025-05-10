@@ -33,7 +33,7 @@ public class AccountServiceController {
     }
 
     @GetMapping("/getAccount/{id}")
-    public Account getMethodName(@PathVariable String id) {
+    public Account getMethodName(@PathVariable("id") String id) {
       return accountServiceService.getAccountsById(id);
    }
     

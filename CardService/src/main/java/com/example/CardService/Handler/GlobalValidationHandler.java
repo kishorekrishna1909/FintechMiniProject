@@ -1,12 +1,10 @@
-package com.example.CardProductService.Handler;
+package com.example.CardService.Handler;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,24 +32,19 @@ public class GlobalValidationHandler {
     return error;
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleIllegalArgs(IllegalStateException ex) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", ex.getMessage());
+    return error;
+    }
+
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleIllegalArgs(NoSuchElementException ex) {
     Map<String, String> error = new HashMap<>();
-    error.put("error", "Card Product Not Found");
-    return error;
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<?> handleInvalidEnum(HttpMessageNotReadableException ex) {
-            return ResponseEntity.badRequest().body("Invalid enum value provided: " + ex.getMessage());
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleIllegalStatus(IllegalStateException ex) {
-    Map<String, String> error = new HashMap<>();
-    error.put("error", ex.getMessage());
+    error.put("error", "Card not Found");
     return error;
     }
 

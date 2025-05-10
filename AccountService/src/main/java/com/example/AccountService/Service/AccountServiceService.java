@@ -3,7 +3,8 @@ package com.example.AccountService.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.*;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
@@ -43,20 +44,23 @@ public class AccountServiceService {
         Customer customer = customerClient.getCustomerById(acc.getCustomerId());
         DepositProduct depositProduct = depositServiceClient.getDepositProduct(acc.getDepositProductId());
 
-        boolean matchFound = false;
         List<PersonCustomer> customerPersons = customer.getPersons();
-                for (PersonCustomer custPerson : customerPersons) {
-                    if (acc.getPersonId().equals(custPerson.getPersonId())) {
-                        matchFound = true;
-                        break;
-                    }
+        Set<String> accountPersonIds = acc.getPersonId();
+        
+        for (String personId : accountPersonIds) {
+            boolean matchFound = false;
+            for (PersonCustomer custPerson : customerPersons) { 
+                System.out.println("service"+personId+"==="+custPerson.getPersonId());
+                if (personId.equals(custPerson.getPersonId())) {
+                    matchFound = true;
+                    break;
                 }
-                
-    
-        if (!matchFound) {
-            throw new IllegalArgumentException("No matching personId found between Account and Customer.");
+            }
+            if (!matchFound) {
+                throw new IllegalArgumentException("No matching personId found between Account and Customer.");
+            }
         }
-  
+                
         List<Account> listOfAccounts=getAccountsByCustomerAndDeposit(acc.getCustomerId(),depositProduct.getDepositProductId());
         if(listOfAccounts.size()<depositProduct.getNoOfAccountPerCustomer()){
             acc.setAccountId(Utility.generateId());
@@ -75,10 +79,7 @@ public class AccountServiceService {
     
             //create ledger account for all deposit account
             ledgerClient.createLedgerAccount(acc);
-
             accountServiceRepo.save(acc);
-    
-
         }else{
             throw new IllegalArgumentException("Account per customer limit reached");
         }

@@ -36,11 +36,12 @@ public class CustomerService {
         return customerRepo.findById(id).orElseThrow();
     }
 
-    public Customer updateCustomers(String id,Customer c) {
-        Customer existingCustomer=getCustomerById(id);
-        existingCustomer.setGender(c.getGender());
+    public Customer updateCustomers(String id, Customer c) {
+        Customer existingCustomer = getCustomerById(id);
+        existingCustomer.setPersons(c.getPersons());  // Replace all persons
         return customerRepo.save(existingCustomer);
     }
+    
 
     public List<Customer> getCustomerByFilter(String name1,String name2) {
        List<Customer> res= customerRepo.getCustomerByFilter(name1,name2);

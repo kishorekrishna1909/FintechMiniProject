@@ -26,6 +26,9 @@ public class PersonCustomer {
 
     public void setPersonId(String generateId) {
         this.personId=generateId; 
-        System.out.println("personid"+personId);
+    }
+
+    public String getGender(){
+        return gender;
     }
 }
